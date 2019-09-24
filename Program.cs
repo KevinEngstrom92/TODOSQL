@@ -19,9 +19,17 @@ namespace TODO
 
                 ConsoleKeyInfo keyPressed = ReadKey(true);
 
+                Clear();
+
                 switch (keyPressed.Key)
                 {
                     case ConsoleKey.D1:
+
+                        break;
+
+                    case ConsoleKey.D3:
+
+                        shouldRun = false;
 
                         break;
                 }
