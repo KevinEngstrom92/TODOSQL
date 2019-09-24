@@ -12,6 +12,8 @@ namespace TODO
         {
             bool shouldRun = true;
 
+            int taskIdCounter = 1;
+
             while (shouldRun)
             {
                 Clear();
@@ -36,10 +38,26 @@ namespace TODO
 
                         DateTime dueDate = DateTime.Parse(ReadLine());
 
-                        taskList[GetIndexPosition()] = new Task(title, dueDate);
+                        taskList[GetIndexPosition()] = new Task(taskIdCounter++, title, dueDate);
 
                         break;
 
+                    case ConsoleKey.D2:
+
+                        WriteLine("ID  Title                   Due date    Completed   ");
+                        WriteLine("----------------------------------------------------");
+
+                        foreach (var task in taskList)
+                        {
+                            if (task == null) continue;
+
+                            WriteLine($"{task.Id}  {task.Title}{task.DueDate.ToString().PadLeft(25, ' ')}");
+                        }
+
+                        ReadKey(true);
+
+                        break;
+                        
                     case ConsoleKey.D3:
 
                         shouldRun = false;
