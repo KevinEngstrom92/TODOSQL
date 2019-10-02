@@ -140,10 +140,14 @@ namespace TODO
         private static void CreateTask(string title, DateTime dueDate)
         {
 
-            string sql = $"INSERT INTO Task (Title, DueDate) VALUES ('{title}','{dueDate}')";
+            string sql = $"INSERT INTO Task (Title, DueDate) VALUES (@TITLE,@DUEDATE)";
+            
             SqlConnection connection = new SqlConnection(connectionString);
             connection.Open();
+            
             SqlCommand command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("TITLE", title);
+            command.Parameters.AddWithValue("DUEDATE", dueDate);
             int result = command.ExecuteNonQuery();
 
             connection.Close();
