@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using System;
+using System.Collections.Generic;
 using TODO.Domain;
 using static System.Console;
 
@@ -19,13 +20,13 @@ namespace TODO
 
 
         static string connectionString = "Data Source=.;Initial Catalog=TODO;Integrated Security=true";
-       
+
         static int taskIdCounter = 1;
         static void Main(string[] args)
         {
             bool shouldRun = true;
 
-            
+
 
             while (shouldRun)
             {
@@ -52,13 +53,13 @@ namespace TODO
                         DateTime dueDate = DateTime.Parse(ReadLine());
 
 
-                         CreateTask( title, dueDate);
+                        CreateTask(title, dueDate);
 
                         break;
 
                     case ConsoleKey.D2:
 
-                        WriteLine("ID  Title                   Due date    Completed   ");
+                        WriteLine("ID".PadRight(5, ' ')+"Title".PadRight(30, ' ')+"Due Date".PadRight(20, ' ')+"Completed");
                         WriteLine("----------------------------------------------------");
 
                         var tasks = FetchAllTasks();
@@ -71,10 +72,15 @@ namespace TODO
                             WriteLine($"{task.Id}  {task.Title}{task.DueDate.ToString().PadLeft(25, ' ')}");
                         }
 
+                        //Write(id.PadRight(5, ' '));
+                        //Write(title.PadRight(30, ' '));
+                        //Write(dueDate.PadRight(20, ' '));
+                        //WriteLine(completed);
+
                         ReadKey(true);
 
                         break;
-                        
+
                     case ConsoleKey.D3:
 
                         shouldRun = false;
@@ -84,9 +90,9 @@ namespace TODO
             }
         }
 
-        private static Task[] FetchAllTasks()
+        private static List<Task> FetchAllTasks()
         {
-            
+
             SqlConnection connection = new SqlConnection(connectionString);
             string sql = @" 
                             SELECT [Id]
@@ -95,9 +101,9 @@ namespace TODO
                             ,[Completed]
                             FROM [TODO].[dbo].[Task]
                                                         ";
-            SqlCommand command = new SqlCommand(sql,connection);
-            
+            SqlCommand command = new SqlCommand(sql, connection);
 
+            List<Task> taskList = new List<Task>();
             connection.Open();
 
             //Skicka SQL kommando till servern
@@ -107,57 +113,48 @@ namespace TODO
             while (dataReader.Read())
             {
 
-                string id = dataReader["Id"].ToString();
+                int id = int.Parse(dataReader["Id"].ToString());
                 string title = dataReader["Title"].ToString();
-                string dueDate = dataReader["DueDate"].ToString();
-                string completed = dataReader["Completed"].ToString();
+
+                
+
+                DateTime.TryParse(dataReader["DueDate"].ToString(), out DateTime dueDate);
+                Task tasken = new Task(id, title, dueDate);
+
+                // string completed = dataReader["Completed"].ToString();
+
+             
 
 
-                Write(id.PadRight(5, ' '));
-                Write(title.PadRight(30, ' '));
-                Write(dueDate.PadRight(20, ' '));
-                WriteLine(completed);
+                taskList.Add(tasken);
 
             }
 
-            Console.WriteLine("Hello Database Yes?");
+            //Console.WriteLine("Hello Database Yes?");
             connection.Close();
 
 
-            return new Task[100];
+            return taskList;
         }
 
         private static void CreateTask(string title, DateTime dueDate)
         {
-            Task[] tasks = FetchAllTasks();
 
-            tasks[GetIndexPosition()] = new Task(taskIdCounter++, title, dueDate);
-            
+            string sql = $"INSERT INTO Task (Title, DueDate) VALUES ('{title}','{dueDate}')";
+            SqlConnection connection = new SqlConnection(connectionString);
+            connection.Open();
+            SqlCommand command = new SqlCommand(sql, connection);
+            int result = command.ExecuteNonQuery();
+
+            connection.Close();
+            Console.Clear();
+            Console.WriteLine(result);
+            Console.ReadKey();
+
+
         }
 
-        
-        static int GetIndexPosition()
-        {
 
-            Task[] tasks = FetchAllTasks();
-            int result = -1;
-            for (int i = 0; i < tasks.Length; i++)
-            {
-                if (tasks[i] != null)
-                {
-                    continue;
-                }
-                if (tasks[i] == null)
-                {
-                    result = i;
-                    break;
-                }
-                if (result == -1)
-                {
-                    throw new Exception("No avalible position");
-                }
-            }
-            return result;
-        }
+
     }
 }
