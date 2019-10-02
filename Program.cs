@@ -1,12 +1,25 @@
-﻿using System;
+﻿using Microsoft.Data.SqlClient;
+using System;
 using TODO.Domain;
 using static System.Console;
+
 
 namespace TODO
 {
     class Program
     {
-        static Task[] taskList = new Task[100];
+        //tre delar, Adress till instansen ; DatabasNamn ; autentisering
+
+        //static string connectionString = "Data Source=.;Initial Catalog=TODO;Integrated Security=true";
+        //static string connectionString = "Data Source=(local);Initial Catalog=TODO;Integrated Security=true";
+        //static string connectionString = "Data Source=localhost;Initial Catalog=TODO;Integrated Security=true";
+        //static string connectionString = "Data Source=127.0.0.1;Initial Catalog=TODO;Integrated Security=true"; FUNKAR EJ
+
+        //static string connectionString = "Server=.;Database=TODO;Integrated Security=true";
+
+
+        static string connectionString = "Data Source=.;Initial Catalog=TODO;Integrated Security=true";
+       
         static int taskIdCounter = 1;
         static void Main(string[] args)
         {
@@ -73,26 +86,37 @@ namespace TODO
 
         private static Task[] FetchAllTasks()
         {
-            return taskList;
+            
+            SqlConnection connection = new SqlConnection(connectionString);
+            connection.Open();
+            Console.WriteLine("Hello Database Yes?");
+            connection.Close();
+
+
+            return new Task[100];
         }
 
         private static void CreateTask(string title, DateTime dueDate)
         {
-            taskList[GetIndexPosition()] = new Task(taskIdCounter++, title, dueDate);
+            Task[] tasks = FetchAllTasks();
+
+            tasks[GetIndexPosition()] = new Task(taskIdCounter++, title, dueDate);
             
         }
 
         
         static int GetIndexPosition()
         {
+
+            Task[] tasks = FetchAllTasks();
             int result = -1;
-            for (int i = 0; i < taskList.Length; i++)
+            for (int i = 0; i < tasks.Length; i++)
             {
-                if (taskList[i] != null)
+                if (tasks[i] != null)
                 {
                     continue;
                 }
-                if (taskList[i] == null)
+                if (tasks[i] == null)
                 {
                     result = i;
                     break;
