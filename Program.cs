@@ -88,7 +88,38 @@ namespace TODO
         {
             
             SqlConnection connection = new SqlConnection(connectionString);
+            string sql = @" 
+                            SELECT [Id]
+                            ,[Title]
+                            ,[DueDate]
+                            ,[Completed]
+                            FROM [TODO].[dbo].[Task]
+                                                        ";
+            SqlCommand command = new SqlCommand(sql,connection);
+            
+
             connection.Open();
+
+            //Skicka SQL kommando till servern
+            //Servern svarar nu i dataReader
+            SqlDataReader dataReader = command.ExecuteReader();
+
+            while (dataReader.Read())
+            {
+
+                string id = dataReader["Id"].ToString();
+                string title = dataReader["Title"].ToString();
+                string dueDate = dataReader["DueDate"].ToString();
+                string completed = dataReader["Completed"].ToString();
+
+
+                Write(id.PadRight(5, ' '));
+                Write(title.PadRight(30, ' '));
+                Write(dueDate.PadRight(20, ' '));
+                WriteLine(completed);
+
+            }
+
             Console.WriteLine("Hello Database Yes?");
             connection.Close();
 
