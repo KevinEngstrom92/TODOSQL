@@ -7,12 +7,12 @@ namespace TODO
     class Program
     {
         static Task[] taskList = new Task[100];
-
+        static int taskIdCounter = 1;
         static void Main(string[] args)
         {
             bool shouldRun = true;
 
-            int taskIdCounter = 1;
+            
 
             while (shouldRun)
             {
@@ -38,7 +38,8 @@ namespace TODO
 
                         DateTime dueDate = DateTime.Parse(ReadLine());
 
-                        taskList[GetIndexPosition()] = new Task(taskIdCounter++, title, dueDate);
+
+                         CreateTask( title, dueDate);
 
                         break;
 
@@ -47,7 +48,10 @@ namespace TODO
                         WriteLine("ID  Title                   Due date    Completed   ");
                         WriteLine("----------------------------------------------------");
 
-                        foreach (var task in taskList)
+                        var tasks = FetchAllTasks();
+
+
+                        foreach (var task in tasks)
                         {
                             if (task == null) continue;
 
@@ -67,6 +71,18 @@ namespace TODO
             }
         }
 
+        private static Task[] FetchAllTasks()
+        {
+            return taskList;
+        }
+
+        private static void CreateTask(string title, DateTime dueDate)
+        {
+            taskList[GetIndexPosition()] = new Task(taskIdCounter++, title, dueDate);
+            
+        }
+
+        
         static int GetIndexPosition()
         {
             int result = -1;
